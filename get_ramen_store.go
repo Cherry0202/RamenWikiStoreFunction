@@ -2,25 +2,29 @@ package main
 
 import (
 	"context"
+	"github.com/joho/godotenv"
 	"log"
+	"os"
 
 	"github.com/kr/pretty"
 	"googlemaps.github.io/maps"
 )
 
 func main() {
-	c, err := maps.NewClient(maps.WithAPIKey("API_KEY"))
+	godotenv.Load()
+	c, err := maps.NewClient(maps.WithAPIKey(os.Getenv("API_KEY")))
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
-	r := &maps.DirectionsRequest{
-		Origin:      "Tokyo",
-		Destination: "ramen",
+	r := &maps.TextSearchRequest{
+		Query:    "ramen in Tokyo",
+		Language: "Japan",
 	}
-	route, _, err := c.Directions(context.Background(), r)
+
+	result, err := c.TextSearch(context.Background(), r)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
 
-	pretty.Println(route)
+	pretty.Println(result)
 }
