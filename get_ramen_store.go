@@ -68,7 +68,7 @@ func main() {
 	resp, err := client.TextSearch(context.Background(), r)
 	check(err)
 
-	newResp, jsnErr := json.Marshal(resp)
+	newResp, jsnErr := json.MarshalIndent(resp, "", "   ")
 	if jsnErr != nil {
 		fmt.Println("JSON marshal error: ", err)
 		return
