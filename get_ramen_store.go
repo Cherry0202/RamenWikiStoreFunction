@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
 
-	"github.com/kr/pretty"
 	"googlemaps.github.io/maps"
 )
 
@@ -27,8 +27,8 @@ var (
 )
 
 func usageAndExit(msg string) {
-	//fmt.Fprintln(os.Stderr, msg)
-	fmt.Println(os.Stderr, msg)
+	fmt.Fprintln(os.Stderr, msg)
+	//fmt.Println(os.Stderr, msg)
 	fmt.Println("Flags:")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -68,7 +68,12 @@ func main() {
 	resp, err := client.TextSearch(context.Background(), r)
 	check(err)
 
-	pretty.Println(resp)
+	newResp, jsnErr := json.Marshal(resp)
+	if jsnErr != nil {
+		fmt.Println("JSON marshal error: ", err)
+		return
+	}
+	fmt.Println(string(newResp))
 }
 
 func parseLocation(location string, r *maps.TextSearchRequest) {
