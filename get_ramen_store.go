@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"log"
+	"net/http"
 	"os"
 
-	"github.com/kr/pretty"
 	"googlemaps.github.io/maps"
 )
 
@@ -26,9 +28,15 @@ var (
 	//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
 )
 
+func handleRequests() {
+	myRouter := mux.NewRouter().StrictSlash(true)
+	myRouter.HandleFunc("/", ReqGooglePlace)
+	log.Fatal(http.ListenAndServe(":8081", myRouter))
+}
+
 func usageAndExit(msg string) {
-	//fmt.Fprintln(os.Stderr, msg)
-	fmt.Println(os.Stderr, msg)
+	fmt.Fprintln(os.Stderr, msg)
+	//fmt.Println(os.Stderr, msg)
 	fmt.Println("Flags:")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -40,7 +48,8 @@ func check(err error) {
 	}
 }
 
-func main() {
+//ReqGooglePlace
+func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	godotenv.Load()
 	flag.Parse()
 
@@ -68,7 +77,13 @@ func main() {
 	resp, err := client.TextSearch(context.Background(), r)
 	check(err)
 
-	pretty.Println(resp)
+	newResp, jsnErr := json.Marshal(resp)
+	if jsnErr != nil {
+		fmt.Println("JSON marshal error: ", err)
+		return
+	}
+	//fmt.Println(string(newResp))
+	fmt.Fprintf(w, string(newResp))
 }
 
 func parseLocation(location string, r *maps.TextSearchRequest) {
@@ -116,4 +131,9 @@ func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
 
 		r.Type = t
 	}
+}
+
+func main() {
+	fmt.Println("Rest API v2.0 - Mux Routers")
+	handleRequests()
 }
