@@ -79,11 +79,15 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 	newResp, jsnErr := json.Marshal(resp)
 	if jsnErr != nil {
-		fmt.Println("JSON marshal error: ", err)
+		//fmt.Println("JSON marshal error: ", err)
+		http.Error(w, "JSON marshal error", http.StatusBadRequest)
 		return
 	}
 	//fmt.Println(string(newResp))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, string(newResp))
+
 }
 
 func parseLocation(location string, r *maps.TextSearchRequest) {
