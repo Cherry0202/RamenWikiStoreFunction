@@ -79,8 +79,8 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 	newResp, jsnErr := json.Marshal(resp)
 	if jsnErr != nil {
-		//fmt.Println("JSON marshal error: ", err)
-		http.Error(w, "JSON marshal error", http.StatusBadRequest)
+		fmt.Println("JSON marshal error: ", err)
+		http.Error(w, jsnErr.Error(), http.StatusBadRequest)
 		return
 	}
 	//fmt.Println(string(newResp))
