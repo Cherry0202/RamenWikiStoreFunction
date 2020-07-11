@@ -1,6 +1,6 @@
 package structs
 
-type GooglePlace struct {
+type ResGooglePlace struct {
 	Results []struct {
 		FormattedAddress string `json:"formatted_address"`
 		Geometry         struct {
@@ -61,5 +61,27 @@ type Rework struct {
 }
 
 type Result struct {
-	FormattedAddress string `json:"formatted_address"`
+	PlaceID          string       `json:"place_id"` // phone number取得時に必要
+	Name             string       `json:"name"`
+	FormattedAddress string       `json:"formatted_address"`
+	OpeningHours     OpeningHours `json:"opening_hours"`
+	Geometry         Geometry     `json:"geometry"`
+	Photos           []Photos     `json:"photos"`
+}
+
+type OpeningHours struct {
+	OpenNow bool `json:"open_now"`
+}
+
+type Geometry struct {
+	Location Location `json:"location"`
+}
+
+type Photos struct {
+	PhotoReference string `json:"photo_reference"`
+}
+
+type Location struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
 }
