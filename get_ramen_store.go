@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"log"
@@ -77,16 +78,43 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	resp, err := client.TextSearch(context.Background(), r)
 	check(err)
 
-	newResp, jsnErr := json.MarshalIndent(resp, "", " ")
+	//jsonResp, jsnErr := json.MarshalIndent(resp, "", " ")
+	jsonResp, jsnErr := json.Marshal(resp)
 	if jsnErr != nil {
 		fmt.Println("JSON marshal error: ", err)
 		http.Error(w, jsnErr.Error(), http.StatusBadRequest)
 		return
 	}
-	//fmt.Println(string(newResp))
+
+	// アクセスしやすいように
+
+	var rework structs.ResGooglePlace
+
+	reworkErr := json.Unmarshal([]byte(string(jsonResp)), &rework)
+
+	if reworkErr != nil {
+		fmt.Println("JSON marshal error: ", err)
+		http.Error(w, reworkErr.Error(), http.StatusBadRequest)
+		return
+	}
+	//reworkJson, reworkJsonErr := json.MarshalIndent(rework.Result[0].Photos[0].PhotoReference, "", " ")
+	//
+	//if reworkJsonErr != nil {
+	//	fmt.Println("JSON marshal error: ", err)
+	//	http.Error(w, reworkJsonErr.Error(), http.StatusBadRequest)
+	//	return
+	//}
+
+	//fmt.Println(rework.Result[0].Photos[0].PhotoReference)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, string(newResp))
+	//fmt.Fprint(w, rework)
+	json.NewEncoder(w).Encode(rework.Results[0].Photos[0].PhotoReference)
+	//fmt.Fprintf(w, string(jsonResp))
+	//w.Write(reworkJson)
+	//fmt.Fprintf(w, string(reworkJson))
+	//fmt.Fprintf(w, rework.Result[0].Photos[0].PhotoReference)
 
 }
 
