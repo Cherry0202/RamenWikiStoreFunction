@@ -79,6 +79,7 @@ type Geometry struct {
 
 type Photos struct {
 	PhotoReference string `json:"photo_reference"`
+	Height         int    `json:"height"`
 }
 
 type Location struct {
