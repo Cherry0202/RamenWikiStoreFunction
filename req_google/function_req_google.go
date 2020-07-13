@@ -16,7 +16,7 @@ import (
 var (
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
-	query     = flag.String("query", "ラーメン　東京", "Text Search query to execute.")
+	query     = flag.String("query", "ラーメン　新宿", "Text Search query to execute.")
 	language  = flag.String("language", "ja", "The language in which to return results.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
 	//radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
@@ -102,7 +102,7 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(rework.Results[0].Photos[0].PhotoReference)
+	json.NewEncoder(w).Encode(rework)
 
 }
 
