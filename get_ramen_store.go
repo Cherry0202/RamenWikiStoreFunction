@@ -78,8 +78,8 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	resp, err := client.TextSearch(context.Background(), r)
 	check(err)
 
-	//jsonResp, jsnErr := json.MarshalIndent(resp, "", " ")
-	jsonResp, jsnErr := json.Marshal(resp)
+	jsonResp, jsnErr := json.MarshalIndent(resp, "", " ")
+	//jsonResp, jsnErr := json.Marshal(resp)
 	if jsnErr != nil {
 		fmt.Println("JSON marshal error: ", err)
 		http.Error(w, jsnErr.Error(), http.StatusBadRequest)
@@ -88,7 +88,8 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 	// アクセスしやすいように
 
-	var rework structs.ResGooglePlace
+	//var rework structs.ResGooglePlace
+	var rework structs.Rework
 
 	reworkErr := json.Unmarshal([]byte(string(jsonResp)), &rework)
 
@@ -97,24 +98,21 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, reworkErr.Error(), http.StatusBadRequest)
 		return
 	}
-	//reworkJson, reworkJsonErr := json.MarshalIndent(rework.Result[0].Photos[0].PhotoReference, "", " ")
-	//
-	//if reworkJsonErr != nil {
-	//	fmt.Println("JSON marshal error: ", err)
-	//	http.Error(w, reworkJsonErr.Error(), http.StatusBadRequest)
-	//	return
-	//}
 
-	//fmt.Println(rework.Result[0].Photos[0].PhotoReference)
+	//w.Header().Set("Content-Type", "application/json")
+	//w.WriteHeader(http.StatusOK)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	for i := range rework.Results {
+		//fmt.Print(rework.Results[i].Photos[i].PhotoReference, v)
+		log.Println(rework.Results[i].Photos[0].PhotoReference)
+		//json.NewEncoder(w).Encode(rework.Results[i].Photos[0].PhotoReference)
+		//json.NewEncoder(w).Encode(rework.Results[i].Photos)
+	}
 	//fmt.Fprint(w, rework)
 	json.NewEncoder(w).Encode(rework.Results[0].Photos[0].PhotoReference)
 	//fmt.Fprintf(w, string(jsonResp))
 	//w.Write(reworkJson)
 	//fmt.Fprintf(w, string(reworkJson))
-	//fmt.Fprintf(w, rework.Result[0].Photos[0].PhotoReference)
 
 }
 
