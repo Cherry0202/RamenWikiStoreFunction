@@ -86,9 +86,6 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	// アクセスしやすいように
-
-	//var rework structs.ResGooglePlace
 	var rework structs.Rework
 
 	reworkErr := json.Unmarshal([]byte(string(jsonResp)), &rework)
@@ -99,20 +96,21 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	//w.Header().Set("Content-Type", "application/json")
-	//w.WriteHeader(http.StatusOK)
-
 	for i := range rework.Results {
-		//fmt.Print(rework.Results[i].Photos[i].PhotoReference, v)
-		log.Println(rework.Results[i].Photos[0].PhotoReference)
-		//json.NewEncoder(w).Encode(rework.Results[i].Photos[0].PhotoReference)
-		//json.NewEncoder(w).Encode(rework.Results[i].Photos)
+		_ = rework.Results[i].Photos[0].PhotoReference
+		_ = rework.Results[i].Photos[0].Height
+		_ = rework.Results[i].PlaceID
+
+		//	TODO make photo function
+
+		// tODO phone number functiono
+
 	}
-	//fmt.Fprint(w, rework)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	json.NewEncoder(w).Encode(rework.Results[0].Photos[0].PhotoReference)
-	//fmt.Fprintf(w, string(jsonResp))
-	//w.Write(reworkJson)
-	//fmt.Fprintf(w, string(reworkJson))
 
 }
 
