@@ -55,9 +55,9 @@ type ResGooglePlace struct {
 }
 
 type Rework struct {
+	Result           []Result      `json:"result"`
 	HTMLAttributions []interface{} `json:"HTMLAttributions"`
 	NextPageToken    string        `json:"NextPageToken"`
-	Result           []Result      `json:"result"`
 }
 
 type Result struct {
