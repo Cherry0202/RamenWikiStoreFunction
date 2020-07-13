@@ -8,7 +8,6 @@ import (
 	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	"github.com/joho/godotenv"
 	"googlemaps.github.io/maps"
-	"image/jpeg"
 	"log"
 	"net/http"
 	"os"
@@ -30,7 +29,6 @@ var (
 	//photoreference = flag.String("photoreference", "", "Textual identifier that uniquely identifies a place photo.")
 	//maxheight      = flag.Int("maxheight", 0, "Specifies the maximum desired height, in pixels, of the image returned by the Place Photos service. One of maxheight and maxwidth is required.")
 	//maxwidth       = flag.Int("maxwidth", 0, "Specifies the maximum desired width, in pixels, of the image returned by the Place Photos service. One of maxheight and maxwidth is required.")
-	basename = flag.String("basename", "", "Base name of file to write image to. If not specified, no file will be written.")
 )
 
 func usageAndExit(msg string) {
@@ -95,12 +93,8 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	for i := range rework.Results {
-		photoRef := rework.Results[i].Photos[0].PhotoReference
-		_ = rework.Results[i].Photos[0].Height
+		//:= rework.Results[i].Photos[0].PhotoReference
 		_ = rework.Results[i].PlaceID
-
-		//	TODO make photo function
-		ReqPhoto(photoRef)
 		// TODO phone number function
 
 	}
@@ -156,48 +150,6 @@ func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
 		}
 
 		r.Type = t
-	}
-}
-
-func ReqPhoto(photoRef string) {
-	godotenv.Load()
-	flag.Parse()
-
-	var apiKey = os.Getenv("API_KEY")
-	var client *maps.Client
-	var err error
-
-	if apiKey != "" {
-		client, err = maps.NewClient(maps.WithAPIKey(apiKey))
-	} else if *clientID != "" || *signature != "" {
-		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
-	} else {
-		usageAndExit("Please specify an API Key, or Client ID and Signature.")
-	}
-	check(err)
-
-	r := &maps.PlacePhotoRequest{
-		PhotoReference: photoRef,
-		MaxHeight:      uint(500),
-		//MaxWidth:       uint(*maxwidth),
-	}
-
-	resp, err := client.PlacePhoto(context.Background(), r)
-	check(err)
-
-	log.Printf("Content-Type: %v\n", resp.ContentType)
-	img, err := resp.Image()
-	check(err)
-	log.Printf("Image bounds: %v", img.Bounds())
-
-	if *basename != "" {
-		filename := fmt.Sprintf("%s.%s", *basename, "jpg")
-		f, err := os.Create(filename)
-		check(err)
-		err = jpeg.Encode(f, img, &jpeg.Options{Quality: 85})
-		check(err)
-
-		log.Printf("Wrote image to %s\n", filename)
 	}
 }
 
