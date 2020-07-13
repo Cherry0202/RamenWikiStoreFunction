@@ -55,12 +55,12 @@ type ResGooglePlace struct {
 }
 
 type Rework struct {
-	Result           []Result      `json:"result"`
+	Results          []Results     `json:"results"`
 	HTMLAttributions []interface{} `json:"HTMLAttributions"`
 	NextPageToken    string        `json:"NextPageToken"`
 }
 
-type Result struct {
+type Results struct {
 	PlaceID          string       `json:"place_id"` // phone number取得時に必要
 	Name             string       `json:"name"`
 	FormattedAddress string       `json:"formatted_address"`
