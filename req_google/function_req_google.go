@@ -48,20 +48,7 @@ func check(err error) {
 
 //ReqGooglePlace
 func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
-	godotenv.Load()
-	flag.Parse()
-
-	var apiKey = os.Getenv("API_KEY")
-	var client *maps.Client
-	var err error
-	if apiKey != "" {
-		client, err = maps.NewClient(maps.WithAPIKey(apiKey))
-	} else if *clientID != "" || *signature != "" {
-		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
-	} else {
-		usageAndExit("Please specify an API Key, or Client ID and Signature.")
-	}
-	check(err)
+	client := apiAuth()
 
 	r := &maps.TextSearchRequest{
 		Query:    *query,
@@ -157,6 +144,23 @@ func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
 
 func reqPhoneNumber(placeId string) {
 
+	client := apiAuth()
+
+	r := &maps.PlaceDetailsRequest{
+		PlaceID:  placeId,
+		Language: *language,
+	}
+
+	resp, err := client.PlaceDetails(context.Background(), r)
+	check(err)
+
+	pretty.Println(resp.Name)
+	pretty.Println(resp.FormattedPhoneNumber)
+
+	return
+}
+
+func apiAuth() *maps.Client {
 	godotenv.Load()
 	flag.Parse()
 
@@ -172,18 +176,7 @@ func reqPhoneNumber(placeId string) {
 	}
 	check(err)
 
-	r := &maps.PlaceDetailsRequest{
-		PlaceID:  placeId,
-		Language: *language,
-	}
-
-	resp, err := client.PlaceDetails(context.Background(), r)
-	check(err)
-
-	pretty.Println(resp.Name)
-	pretty.Println(resp.FormattedPhoneNumber)
-
-	return
+	return client
 }
 
 // TODO DB connection
