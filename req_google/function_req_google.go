@@ -14,10 +14,12 @@ import (
 	"os"
 )
 
+const searchQuery = "ラーメン　新宿"
+
 var (
 	clientID  = flag.String("client_id", "", "ClientID for Maps for Work API access.")
 	signature = flag.String("signature", "", "Signature for Maps for Work API access.")
-	query     = flag.String("query", "ラーメン　新宿", "Text Search query to execute.")
+	query     = flag.String("query", searchQuery, "Text Search query to execute.")
 	language  = flag.String("language", "ja", "The language in which to return results.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
 	//radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
@@ -25,11 +27,9 @@ var (
 	maxprice = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	//opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
-	//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
-	//apiKey = flag.String("key", "", "API Key for using Google Maps API.")
-	//photoreference = flag.String("photoreference", "", "Textual identifier that uniquely identifies a place photo.")
-	//maxheight      = flag.Int("maxheight", 0, "Specifies the maximum desired height, in pixels, of the image returned by the Place Photos service. One of maxheight and maxwidth is required.")
-	//maxwidth       = flag.Int("maxwidth", 0, "Specifies the maximum desired width, in pixels, of the image returned by the Place Photos service. One of maxheight and maxwidth is required.")
+
+//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
+//apiKey = flag.String("key", "", "API Key for using Google Maps API.")
 )
 
 func usageAndExit(msg string) {
