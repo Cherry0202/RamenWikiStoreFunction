@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	"github.com/joho/godotenv"
+	"github.com/kr/pretty"
 	"googlemaps.github.io/maps"
 	"log"
 	"net/http"
@@ -94,8 +95,9 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 	for i := range rework.Results {
 		//:= rework.Results[i].Photos[0].PhotoReference
-		_ = rework.Results[i].PlaceID
+		placeId := rework.Results[i].PlaceID
 		// TODO phone number function
+		reqPhoneNumber(placeId)
 
 	}
 
@@ -151,6 +153,37 @@ func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
 
 		r.Type = t
 	}
+}
+
+func reqPhoneNumber(placeId string) {
+
+	godotenv.Load()
+	flag.Parse()
+
+	var apiKey = os.Getenv("API_KEY")
+	var client *maps.Client
+	var err error
+	if apiKey != "" {
+		client, err = maps.NewClient(maps.WithAPIKey(apiKey))
+	} else if *clientID != "" || *signature != "" {
+		client, err = maps.NewClient(maps.WithClientIDAndSignature(*clientID, *signature))
+	} else {
+		usageAndExit("Please specify an API Key, or Client ID and Signature.")
+	}
+	check(err)
+
+	r := &maps.PlaceDetailsRequest{
+		PlaceID:  placeId,
+		Language: *language,
+	}
+
+	resp, err := client.PlaceDetails(context.Background(), r)
+	check(err)
+
+	pretty.Println(resp.Name)
+	pretty.Println(resp.FormattedPhoneNumber)
+
+	return
 }
 
 // TODO DB connection
