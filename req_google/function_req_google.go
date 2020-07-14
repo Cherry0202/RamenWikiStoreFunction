@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	"github.com/joho/godotenv"
-	"github.com/kr/pretty"
 	"googlemaps.github.io/maps"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const searchQuery = "ラーメン　新宿"
@@ -27,14 +27,13 @@ var (
 	maxprice = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	//opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
-
-//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
+	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours", "Comma seperated list of Fields")
+	//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
 //apiKey = flag.String("key", "", "API Key for using Google Maps API.")
 )
 
 func usageAndExit(msg string) {
 	fmt.Fprintln(os.Stderr, msg)
-	//fmt.Println(os.Stderr, msg)
 	fmt.Println("Flags:")
 	flag.PrintDefaults()
 	os.Exit(2)
@@ -81,10 +80,10 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	}
 
 	for i := range rework.Results {
-		//:= rework.Results[i].Photos[0].PhotoReference
 		placeId := rework.Results[i].PlaceID
 		// TODO phone number function
-		reqPhoneNumber(placeId)
+		//
+		_ = reqPhoneNumber(placeId)
 
 	}
 
@@ -142,7 +141,7 @@ func parsePlaceType(placeType string, r *maps.TextSearchRequest) {
 	}
 }
 
-func reqPhoneNumber(placeId string) {
+func reqPhoneNumber(placeId string) maps.PlaceDetailsResult {
 
 	client := apiAuth()
 
@@ -151,13 +150,29 @@ func reqPhoneNumber(placeId string) {
 		Language: *language,
 	}
 
+	if *fields != "" {
+		f, err := parseFields(*fields)
+		check(err)
+		r.Fields = f
+	}
+
 	resp, err := client.PlaceDetails(context.Background(), r)
 	check(err)
 
-	pretty.Println(resp.Name)
-	pretty.Println(resp.FormattedPhoneNumber)
+	return resp
+	//pretty.Println(resp.FormattedPhoneNumber)
+}
 
-	return
+func parseFields(fields string) ([]maps.PlaceDetailsFieldMask, error) {
+	var res []maps.PlaceDetailsFieldMask
+	for _, s := range strings.Split(fields, ",") {
+		f, err := maps.ParsePlaceDetailsFieldMask(s)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, f)
+	}
+	return res, nil
 }
 
 func apiAuth() *maps.Client {
