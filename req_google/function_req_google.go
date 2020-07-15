@@ -82,15 +82,17 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	for i := range rework.Results {
 		placeId := rework.Results[i].PlaceID
 		// TODO phone number function
-		//
-		_ = reqPhoneNumber(placeId)
+
+		resp := reqPhoneNumber(placeId)
+
+		log.Println(resp)
 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(rework)
+	json.NewEncoder(w).Encode(rework.Results[0].Geometry.Location)
 
 }
 
