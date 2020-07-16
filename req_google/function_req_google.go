@@ -23,14 +23,10 @@ var (
 	query     = flag.String("query", searchQuery, "Text Search query to execute.")
 	language  = flag.String("language", "ja", "The language in which to return results.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
-	//radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
-	minprice = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
-	maxprice = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
-	//opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
+	minprice  = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
+	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
 	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours,website", "Comma seperated list of Fields")
-	//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
-//apiKey = flag.String("key", "", "API Key for using Google Maps API.")
 )
 
 func usageAndExit(msg string) {
@@ -46,7 +42,6 @@ func check(err error) {
 	}
 }
 
-//ReqGooglePlace
 func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	client := apiAuth()
 
@@ -63,7 +58,6 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	check(err)
 
 	jsonResp, jsnErr := json.MarshalIndent(resp, "", " ")
-	//jsonResp, jsnErr := json.Marshal(resp)
 	if jsnErr != nil {
 		fmt.Println("JSON marshal error: ", err)
 		http.Error(w, jsnErr.Error(), http.StatusBadRequest)
@@ -169,7 +163,6 @@ func reqPhoneNumber(placeId string) maps.PlaceDetailsResult {
 	check(err)
 
 	return resp
-	//pretty.Println(resp.FormattedPhoneNumber)
 }
 
 func parseFields(fields string) ([]maps.PlaceDetailsFieldMask, error) {
@@ -202,5 +195,3 @@ func apiAuth() *maps.Client {
 
 	return client
 }
-
-// TODO DB connection

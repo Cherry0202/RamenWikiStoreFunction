@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"log"
@@ -19,7 +18,6 @@ func dbInit() *sql.DB {
 	return db
 }
 
-//TODO lat,lng 追加
 func InsertStore(storeName string, storeAddress string, openNow int, phoneNumber string, webSite string, photoRef string, lat float64, lng float64, openTime string) (error, string) {
 	db := dbInit()
 	defer db.Close()
@@ -54,23 +52,4 @@ func SelectStore(storeName string) (error, int) {
 	}
 
 	return nil, storeId
-}
-
-func main() {
-	//err, storeName := InsertStore()
-	storeName := "hoge_store_name"
-	err, storeId := SelectStore(storeName)
-	if err != nil {
-		log.Println("エラー")
-		log.Println(err)
-	}
-	err = InsertWiki(storeId, storeName)
-	if err != nil {
-		log.Println("エラー")
-		log.Println(err)
-	} else {
-		fmt.Println("ok")
-	}
-	//fmt.Println(storeId)
-	//fmt.Println()
 }
