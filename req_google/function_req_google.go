@@ -38,7 +38,7 @@ func usageAndExit(msg string) {
 
 func check(err error) {
 	if err != nil {
-		log.Fatalf("fatal error: %s", err)
+		log.Println("fatal error: %s", err)
 	}
 }
 
@@ -58,38 +58,43 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	check(err)
 
 	jsonResp, jsnErr := json.MarshalIndent(resp, "", " ")
-	if jsnErr != nil {
-		fmt.Println("JSON marshal error: ", err)
-		http.Error(w, jsnErr.Error(), http.StatusBadRequest)
-		return
-	}
+	check(jsnErr)
 
 	var rework structs.Rework
 
 	reworkErr := json.Unmarshal([]byte(string(jsonResp)), &rework)
+	check(reworkErr)
 
-	if reworkErr != nil {
-		fmt.Println("JSON marshal error: ", err)
-		http.Error(w, reworkErr.Error(), http.StatusBadRequest)
-		return
-	}
 	open_now := 0
 	for i := range rework.Results {
 		placeId := rework.Results[i].PlaceID
 		resp := reqPhoneNumber(placeId)
-		log.Println(strings.Join(resp.OpeningHours.WeekdayText, ","))
 		err, storeName := db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, strings.Join(resp.OpeningHours.WeekdayText, ","))
-		_, storeId := db.SelectStore(storeName)
-		_ = db.InsertWiki(storeId, storeName)
-		log.Println(err)
-		log.Println(i, storeName, "ok")
-
+		if err != nil {
+			break
+		}
+		err, storeId := db.SelectStore(storeName)
+		if err != nil {
+			break
+		}
+		err = db.InsertWiki(storeId, storeName)
+		if err != nil {
+			break
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("end")
-
+	response := structs.Response{}
+	if err != nil {
+		response.Message = "OK"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(response)
+	} else {
+		response.Message = "Error"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 func parseLocation(location string, r *maps.TextSearchRequest) {
