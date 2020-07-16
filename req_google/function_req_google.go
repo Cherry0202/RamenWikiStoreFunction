@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/Cherry0202/RamenWikiStoreFunction/db"
 	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	"github.com/joho/godotenv"
 	"googlemaps.github.io/maps"
@@ -22,14 +23,10 @@ var (
 	query     = flag.String("query", searchQuery, "Text Search query to execute.")
 	language  = flag.String("language", "ja", "The language in which to return results.")
 	location  = flag.String("location", "", "The latitude/longitude around which to retrieve place information. This must be specified as latitude,longitude.")
-	//radius    = flag.Uint("radius", 0, "Defines the distance (in meters) within which to bias place results. The maximum allowed radius is 50,000 meters.")
-	minprice = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
-	maxprice = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
-	//opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
+	minprice  = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
+	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
-	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours", "Comma seperated list of Fields")
-	//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
-//apiKey = flag.String("key", "", "API Key for using Google Maps API.")
+	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours,website", "Comma seperated list of Fields")
 )
 
 func usageAndExit(msg string) {
@@ -41,11 +38,10 @@ func usageAndExit(msg string) {
 
 func check(err error) {
 	if err != nil {
-		log.Fatalf("fatal error: %s", err)
+		log.Println("fatal error: %s", err)
 	}
 }
 
-//ReqGooglePlace
 func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	client := apiAuth()
 
@@ -62,38 +58,43 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	check(err)
 
 	jsonResp, jsnErr := json.MarshalIndent(resp, "", " ")
-	//jsonResp, jsnErr := json.Marshal(resp)
-	if jsnErr != nil {
-		fmt.Println("JSON marshal error: ", err)
-		http.Error(w, jsnErr.Error(), http.StatusBadRequest)
-		return
-	}
+	check(jsnErr)
 
 	var rework structs.Rework
 
 	reworkErr := json.Unmarshal([]byte(string(jsonResp)), &rework)
+	check(reworkErr)
 
-	if reworkErr != nil {
-		fmt.Println("JSON marshal error: ", err)
-		http.Error(w, reworkErr.Error(), http.StatusBadRequest)
-		return
-	}
-
+	open_now := 0
 	for i := range rework.Results {
 		placeId := rework.Results[i].PlaceID
-		// TODO phone number function
-
 		resp := reqPhoneNumber(placeId)
-
-		log.Println(resp)
-
+		err, storeName := db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, strings.Join(resp.OpeningHours.WeekdayText, ","))
+		if err != nil {
+			break
+		}
+		err, storeId := db.SelectStore(storeName)
+		if err != nil {
+			break
+		}
+		err = db.InsertWiki(storeId, storeName)
+		if err != nil {
+			break
+		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	json.NewEncoder(w).Encode(rework.Results[0].Geometry.Location)
-
+	response := structs.Response{}
+	if err != nil {
+		response.Message = "Error"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+	} else {
+		response.Message = "OK"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
 func parseLocation(location string, r *maps.TextSearchRequest) {
@@ -162,7 +163,6 @@ func reqPhoneNumber(placeId string) maps.PlaceDetailsResult {
 	check(err)
 
 	return resp
-	//pretty.Println(resp.FormattedPhoneNumber)
 }
 
 func parseFields(fields string) ([]maps.PlaceDetailsFieldMask, error) {
@@ -195,5 +195,3 @@ func apiAuth() *maps.Client {
 
 	return client
 }
-
-// TODO DB connection
