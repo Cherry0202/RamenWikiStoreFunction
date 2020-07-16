@@ -35,12 +35,12 @@ func InsertStore() (error, string) {
 
 func InsertWiki(storeId int, storeName string) error {
 	db := dbInit()
-	ins, err := db.Prepare("INSERT INTO wiki(store_id,store_name) VALUES(?,?)")
+	ins, err := db.Prepare("INSERT INTO wiki(store_id,text,store_user_sum,created_at) VALUES(?,?,?,?)")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("insert wiki error")
 		return err
 	}
-	ins.Exec(storeId, storeName)
+	ins.Exec(storeId, storeName, 1, time.Now().Format("2006-01-02 03:04:05"))
 	return nil
 }
 
