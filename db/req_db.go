@@ -19,16 +19,17 @@ func dbInit() *sql.DB {
 }
 
 //TODO lat,lng 追加
-func InsertStore() error {
+func InsertStore() (error, string) {
 	db := dbInit()
 	defer db.Close()
 	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo) VALUES(?,?,?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
-		return err
+		return err, ""
 	}
-	ins.Exec("hoge_store_name", "hoge_address", 1, "hoge_phone_number", "hoge_website", "hoge_photo")
-	return nil
+	storeName := "hoge_store_name"
+	ins.Exec(storeName, "hoge_address", 1, "hoge_phone_number", "hoge_website", "hoge_photo")
+	return nil, storeName
 }
 
 func InsertWiki() error {
