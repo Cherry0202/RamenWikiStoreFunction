@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"time"
 )
 
 func dbInit() *sql.DB {
@@ -22,13 +23,13 @@ func dbInit() *sql.DB {
 func InsertStore() (error, string) {
 	db := dbInit()
 	defer db.Close()
-	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo) VALUES(?,?,?,?,?,?)")
+	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo,created_at) VALUES(?,?,?,?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 		return err, ""
 	}
 	storeName := "hoge_store_name"
-	ins.Exec(storeName, "hoge_address", 1, "hoge_phone_number", "hoge_website", "hoge_photo")
+	ins.Exec(storeName, "hoge_address", 1, "hoge_phone_number", "hoge_website", "hoge_photo", time.Now().Format("2006-01-02 03:04:05"))
 	return nil, storeName
 }
 
