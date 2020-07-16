@@ -34,7 +34,6 @@ func InsertWiki(storeId int, storeName string) error {
 	db := dbInit()
 	ins, err := db.Prepare("INSERT INTO wiki(store_id,text,store_user_sum,created_at) VALUES(?,?,?,?)")
 	if err != nil {
-		log.Println(err)
 		return err
 	}
 	ins.Exec(storeId, storeName, 1, time.Now().Format("2006-01-02 03:04:05"))
@@ -47,7 +46,7 @@ func SelectStore(storeName string) (error, int) {
 	var storeId int
 
 	if err := db.QueryRow("SELECT id FROM store WHERE store_name = ?", storeName).Scan(&storeId); err != nil {
-		log.Fatal("select store error")
+		log.Println(err, "in select store error")
 		return err, storeId
 	}
 
