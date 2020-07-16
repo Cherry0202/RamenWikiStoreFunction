@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -20,16 +20,15 @@ func dbInit() *sql.DB {
 }
 
 //TODO lat,lng 追加
-func InsertStore() (error, string) {
+func InsertStore(storeName string, storeAddress string, openNow int, phoneNumber string, webSite string, photoRef string, lat float64, lng float64, openTime []string) (error, string) {
 	db := dbInit()
 	defer db.Close()
-	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo,created_at) VALUES(?,?,?,?,?,?,?)")
+	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo,lat,lng,open_time,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 		return err, ""
 	}
-	storeName := "hoge_store_name"
-	ins.Exec(storeName, "hoge_address", 1, "hoge_phone_number", "hoge_website", "hoge_photo", time.Now().Format("2006-01-02 03:04:05"))
+	ins.Exec(storeName, storeAddress, openNow, phoneNumber, webSite, photoRef, lat, lng, openTime, time.Now().Format("2006-01-02 03:04:05"))
 	return nil, storeName
 }
 
@@ -37,7 +36,7 @@ func InsertWiki(storeId int, storeName string) error {
 	db := dbInit()
 	ins, err := db.Prepare("INSERT INTO wiki(store_id,text,store_user_sum,created_at) VALUES(?,?,?,?)")
 	if err != nil {
-		log.Fatal("insert wiki error")
+		log.Println(err)
 		return err
 	}
 	ins.Exec(storeId, storeName, 1, time.Now().Format("2006-01-02 03:04:05"))
@@ -50,7 +49,7 @@ func SelectStore(storeName string) (error, int) {
 	var storeId int
 
 	if err := db.QueryRow("SELECT id FROM store WHERE store_name = ?", storeName).Scan(&storeId); err != nil {
-		log.Fatal(err)
+		log.Fatal("select store error")
 		return err, storeId
 	}
 
