@@ -20,7 +20,7 @@ func dbInit() *sql.DB {
 }
 
 //TODO lat,lng 追加
-func InsertStore(storeName string, storeAddress string, openNow int, phoneNumber string, webSite string, photoRef string, lat float64, lng float64, openTime []string) (error, string) {
+func InsertStore(storeName string, storeAddress string, openNow int, phoneNumber string, webSite string, photoRef string, lat float64, lng float64, openTime string) (error, string) {
 	db := dbInit()
 	defer db.Close()
 	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo,lat,lng,open_time,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)")
@@ -28,7 +28,7 @@ func InsertStore(storeName string, storeAddress string, openNow int, phoneNumber
 		log.Println(err)
 		return err, ""
 	}
-	ins.Exec(storeName, storeAddress, openNow, phoneNumber, webSite, photoRef, lat, lng, "hoge", time.Now().Format("2006-01-02 03:04:05"))
+	ins.Exec(storeName, storeAddress, openNow, phoneNumber, webSite, photoRef, lat, lng, openTime, time.Now().Format("2006-01-02 03:04:05"))
 	return nil, storeName
 }
 
