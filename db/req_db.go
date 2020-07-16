@@ -32,14 +32,14 @@ func InsertStore() (error, string) {
 	return nil, storeName
 }
 
-func InsertWiki() error {
+func InsertWiki(storeId int, storeName string) error {
 	db := dbInit()
-	ins, err := db.Prepare("INSERT INTO store(hoge,hoge,hoge,hoge) VALUES(?,?,?,?)")
+	ins, err := db.Prepare("INSERT INTO wiki(store_id,store_name) VALUES(?,?)")
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
-	ins.Exec("golang-2019", "golang+001@gmail.com", "Jhon", "123456")
+	ins.Exec(storeId, storeName)
 	return nil
 }
 
@@ -57,8 +57,8 @@ func SelectStore(storeName string) (error, int) {
 }
 
 func main() {
-	//err := InsertStore()
-	storeName := "hoge_store_name"
+	err, storeName := InsertStore()
+	storeName = "hoge_store_name"
 	err, storeId := SelectStore(storeName)
 	if err != nil {
 		log.Println("エラー")
