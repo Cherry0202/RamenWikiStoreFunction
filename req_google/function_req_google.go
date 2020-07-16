@@ -86,11 +86,12 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 		resp := reqPhoneNumber(placeId)
 
-		log.Println(rework.Results[i].Geometry.Location.Lat)
-		db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, resp.OpeningHours.WeekdayText)
+		log.Println(rework.Results[i].Geometry.Location.Lng)
+		err, storeName := db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, resp.OpeningHours.WeekdayText)
 		//_, storeId := db.SelectStore(storeName)
 		//_ = db.InsertWiki(storeId, storeName)
-		log.Println(i, "ok")
+		log.Println(err)
+		log.Println(i, storeName, "ok")
 
 	}
 
