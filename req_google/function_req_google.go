@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/Cherry0202/RamenWikiStoreFunction/db"
 	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	"github.com/joho/godotenv"
 	"googlemaps.github.io/maps"
@@ -27,7 +28,7 @@ var (
 	maxprice = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	//opennow   = flag.Bool("open_now", false, "Restricts results to only those places that are open for business at the time the query is sent.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
-	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours", "Comma seperated list of Fields")
+	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours,website", "Comma seperated list of Fields")
 	//region   = flag.String("region", "JP", "The region code, specified as a ccTLD two-character value.")
 //apiKey = flag.String("key", "", "API Key for using Google Maps API.")
 )
@@ -78,21 +79,26 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		http.Error(w, reworkErr.Error(), http.StatusBadRequest)
 		return
 	}
-
+	open_now := 0
 	for i := range rework.Results {
 		placeId := rework.Results[i].PlaceID
 		// TODO phone number function
 
 		resp := reqPhoneNumber(placeId)
 
-		log.Println(resp)
+		log.Println(rework.Results[i].Geometry.Location.Lat)
+		db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, resp.OpeningHours.WeekdayText)
+		//_, storeId := db.SelectStore(storeName)
+		//_ = db.InsertWiki(storeId, storeName)
+		log.Println(i, "ok")
 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(rework.Results[0].Geometry.Location)
+	//json.NewEncoder(w).Encode(rework.Results[0].Geometry.Location)
+	json.NewEncoder(w).Encode("end")
 
 }
 

@@ -57,12 +57,20 @@ func SelectStore(storeName string) (error, int) {
 }
 
 func main() {
-	err, storeName := InsertStore()
-	storeName = "hoge_store_name"
+	//err, storeName := InsertStore()
+	storeName := "hoge_store_name"
 	err, storeId := SelectStore(storeName)
 	if err != nil {
 		log.Println("エラー")
 		log.Println(err)
 	}
-	fmt.Println(storeId)
+	err = InsertWiki(storeId, storeName)
+	if err != nil {
+		log.Println("エラー")
+		log.Println(err)
+	} else {
+		fmt.Println("ok")
+	}
+	//fmt.Println(storeId)
+	//fmt.Println()
 }
