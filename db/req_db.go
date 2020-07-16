@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"log"
@@ -41,10 +42,25 @@ func InsertWiki() error {
 	return nil
 }
 
-func main() {
-	err := InsertStore()
-	if err != nil {
-		log.Println("エラー")
-		log.Println(err)
+func SelectStore() {
+	db := dbInit()
+
+	storeName := "hoge_store_name"
+
+	var result int
+
+	if err := db.QueryRow("SELECT id FROM store WHERE store_name = ?", storeName).Scan(&result); err != nil {
+		log.Fatal(err)
 	}
+
+	fmt.Println(result)
+}
+
+func main() {
+	//err := InsertStore()
+	SelectStore()
+	//if err != nil {
+	//	log.Println("エラー")
+	//	log.Println(err)
+	//}
 }
