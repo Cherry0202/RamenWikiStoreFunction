@@ -85,14 +85,14 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 	response := structs.Response{}
 	if err != nil {
-		response.Message = "OK"
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(response)
-	} else {
 		response.Message = "Error"
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+	} else {
+		response.Message = "OK"
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(response)
 	}
 }
