@@ -42,25 +42,26 @@ func InsertWiki() error {
 	return nil
 }
 
-func SelectStore() {
+func SelectStore(storeName string) (error, int) {
 	db := dbInit()
 
-	storeName := "hoge_store_name"
+	var storeId int
 
-	var result int
-
-	if err := db.QueryRow("SELECT id FROM store WHERE store_name = ?", storeName).Scan(&result); err != nil {
+	if err := db.QueryRow("SELECT id FROM store WHERE store_name = ?", storeName).Scan(&storeId); err != nil {
 		log.Fatal(err)
+		return err, storeId
 	}
 
-	fmt.Println(result)
+	return nil, storeId
 }
 
 func main() {
 	//err := InsertStore()
-	SelectStore()
-	//if err != nil {
-	//	log.Println("エラー")
-	//	log.Println(err)
-	//}
+	storeName := "hoge_store_name"
+	err, storeId := SelectStore(storeName)
+	if err != nil {
+		log.Println("エラー")
+		log.Println(err)
+	}
+	fmt.Println(storeId)
 }
