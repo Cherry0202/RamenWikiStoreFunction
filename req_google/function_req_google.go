@@ -76,10 +76,7 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 	open_now := 0
 	for i := range rework.Results {
 		placeId := rework.Results[i].PlaceID
-		// TODO phone number function
-
 		resp := reqPhoneNumber(placeId)
-
 		log.Println(strings.Join(resp.OpeningHours.WeekdayText, ","))
 		err, storeName := db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, strings.Join(resp.OpeningHours.WeekdayText, ","))
 		_, storeId := db.SelectStore(storeName)
@@ -91,8 +88,6 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-
-	//json.NewEncoder(w).Encode(rework.Results[0].Geometry.Location)
 	json.NewEncoder(w).Encode("end")
 
 }
