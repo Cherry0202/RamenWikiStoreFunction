@@ -3,17 +3,18 @@ package main
 import (
 	"fmt"
 	"github.com/Cherry0202/RamenWikiStoreFunction/req_google"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
+const addr = ":8081"
+
 func handleRequests() {
-	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", req_google.ReqGooglePlace)
-	log.Fatal(http.ListenAndServe(":8081", myRouter))
+	http.HandleFunc("/", req_google.ReqGooglePlace)
+	log.Println("Listening on localhost" + addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
 func main() {
-	fmt.Println("Rest API v2.0 - Mux Routers")
+	fmt.Println("Ramen Wiki Store Function")
 	handleRequests()
 }
