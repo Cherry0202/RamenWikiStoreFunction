@@ -36,6 +36,14 @@ func usageAndExit(msg string) {
 	os.Exit(2)
 }
 
+func respJson(w http.ResponseWriter, msg string) {
+	response := structs.Response{}
+	response.Message = msg
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+	json.NewEncoder(w).Encode(response)
+}
+
 func check(err error) {
 	if err != nil {
 		log.Println("fatal error: %s", err)
@@ -71,29 +79,24 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		resp := reqPhoneNumber(placeId)
 		err, storeName := db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, strings.Join(resp.OpeningHours.WeekdayText, ","))
 		if err != nil {
+			respJson(w, err.Error())
 			break
 		}
 		err, storeId := db.SelectStore(storeName)
 		if err != nil {
+			respJson(w, err.Error())
 			break
 		}
 		err = db.InsertWiki(storeId, storeName)
 		if err != nil {
+			respJson(w, err.Error())
 			break
 		}
 	}
 
-	response := structs.Response{}
-	if err != nil {
-		response.Message = "Error"
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(response)
-	} else {
-		response.Message = "OK"
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(response)
+	head := w.Header().Get("Content-Type")
+	if head != "application/json" {
+		respJson(w, "OK")
 	}
 }
 
