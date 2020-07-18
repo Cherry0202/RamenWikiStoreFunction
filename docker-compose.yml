@@ -7,5 +7,8 @@ services:
     tty: true
     volumes:
       - .:/go/src/github.com/Cherry0202/RamenWikiStoreFunction
+    # 環境変数確認
+    command:
+      - 'env'
     ports:
       - "8080:8080"
