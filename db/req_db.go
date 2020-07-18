@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"log"
@@ -11,7 +12,9 @@ import (
 
 func dbInit() *sql.DB {
 	godotenv.Load()
-	db, err := sql.Open("mysql", os.Getenv("DB_USER")+":"+os.Getenv("DB_PASS")+"@tcp("+os.Getenv("DB_TCP")+")/"+os.Getenv("DB_NAME"))
+	fmt.Println(os.Getenv("DB_NAME"))
+	db, err := sql.Open("mysql", os.Getenv("DB_ROOT_USER")+":"+os.Getenv("DB_ROOT_PASS")+"@tcp("+os.Getenv("PORT")+":"+os.Getenv("DB_CONNECTION_PORT")+")/"+os.Getenv("DB_NAME"))
+
 	if err != nil {
 		log.Println(err, "in db init error")
 	}

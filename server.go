@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const addr = ":8081"
+const addr = ":8080"
 
 func handleRequests() {
 	http.HandleFunc("/", req_google.ReqGooglePlace)

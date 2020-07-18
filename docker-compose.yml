@@ -1,11 +1,29 @@
 version: '3'
 services:
-  app:
-#    env_file:
-#      - .env
+  api:
+    env_file:
+      - .env
     build: .
     tty: true
     volumes:
       - .:/go/src/github.com/Cherry0202/RamenWikiStoreFunction
+    # 環境変数確認
     ports:
-      - "8081:8081"
+      - "8080:8080"
+
+  db:
+    build: ./mysql
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      TZ: 'Asia/Tokyo'
+    ports:
+      - "3314:${PORT}"
+    volumes:
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./log/mysql:/var/log/mysql
