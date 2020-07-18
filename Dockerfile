@@ -7,4 +7,3 @@ COPY go.sum .
 RUN go mod download
 COPY . .
 ADD . /go/src/github.com/Cherry0202/RamenWikiStoreFunction
-CMD ["go", "run", "server.go"]
