@@ -8,8 +8,6 @@ services:
     volumes:
       - .:/go/src/github.com/Cherry0202/RamenWikiStoreFunction
     # 環境変数確認
-    command:
-      - 'env'
     ports:
       - "8080:8080"
 
@@ -24,7 +22,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
       TZ: 'Asia/Tokyo'
     ports:
-      - "3314:3306"
+      - "3314:${PORT}"
     volumes:
       - ./mysql/initdb.d:/docker-entrypoint-initdb.d
       - ./mysql/conf.d:/etc/mysql/conf.d
