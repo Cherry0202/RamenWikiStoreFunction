@@ -26,7 +26,7 @@ var (
 	minprice  = flag.String("min_price", "", "Restricts results to only those places within the specified price level.")
 	maxprice  = flag.String("max_price", "", "Restricts results to only those places within the specified price level.")
 	placeType = flag.String("type", "", "Restricts the results to places matching the specified type.")
-	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours,website", "Comma seperated list of Fields")
+	fields    = flag.String("fields", "name,formatted_phone_number,opening_hours,website", "Comma separated list of Fields")
 )
 
 func usageAndExit(msg string) {
