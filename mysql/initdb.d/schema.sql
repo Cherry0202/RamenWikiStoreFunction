@@ -1,3 +1,2 @@
+DROP DATABASE IF EXISTS ramen;
 CREATE DATABASE ramen;
-
-use ramen;
