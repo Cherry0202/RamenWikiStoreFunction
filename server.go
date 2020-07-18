@@ -18,3 +18,5 @@ func main() {
 	fmt.Println("Ramen Wiki Store Function")
 	handleRequests()
 }
+
+// TODO laravel migration connect to docker db
