@@ -9,14 +9,17 @@ import (
 	"time"
 )
 
+const (
+	driver      = "mysql"
+	dbContainer = "mysql-container"
+)
+
 func dbInit() *sql.DB {
 	godotenv.Load()
-	db, err := sql.Open("mysql", os.Getenv("DB_ROOT_USER")+":"+os.Getenv("DB_ROOT_PASS")+"@tcp("+os.Getenv("PORT")+":"+os.Getenv("DB_CONNECTION_PORT")+")/"+os.Getenv("DB_NAME"))
-
+	var dsn = os.Getenv("DB_USER") + ":" + os.Getenv("DB_PASS") + "@tcp(" + dbContainer + ":" + os.Getenv("PORT") + ")/" + os.Getenv("DB_NAME")
+	db, err := sql.Open(driver, dsn)
 	if err != nil {
 		log.Println(err, "in db init error")
-	} else {
-		log.Println("DB connected")
 	}
 	return db
 }
@@ -26,7 +29,7 @@ func InsertStore(storeName string, storeAddress string, openNow int, phoneNumber
 	defer db.Close()
 	ins, err := db.Prepare("INSERT INTO store(store_name,address,open_now,phone_number,website,photo,lat,lng,open_time,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)")
 	if err != nil {
-		log.Println(err, "in insert store error")
+		log.Println(err.Error(), "in insert store error")
 		return err, ""
 	}
 	ins.Exec(storeName, storeAddress, openNow, phoneNumber, webSite, photoRef, lat, lng, openTime, time.Now().Format("2006-01-02 03:04:05"))
