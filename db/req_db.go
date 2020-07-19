@@ -16,7 +16,7 @@ const (
 
 func dbInit() *sql.DB {
 	godotenv.Load()
-	var dsn = os.Getenv("DB_USER") + ":" + os.Getenv("DB_PASS") + "@tcp(" + dbContainer + ":" + os.Getenv("PORT") + ")/" + os.Getenv("DB_NAME")
+	dsn := os.Getenv("DB_USER") + ":" + os.Getenv("DB_PASS") + "@tcp(" + dbContainer + ":" + os.Getenv("PORT") + ")/" + os.Getenv("DB_NAME")
 	db, err := sql.Open(driver, dsn)
 	if err != nil {
 		log.Println(err, "in db init error")
