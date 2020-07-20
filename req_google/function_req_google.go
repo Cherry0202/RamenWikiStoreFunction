@@ -92,6 +92,9 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 			respJson(w, err.Error())
 			break
 		}
+		if i == 20 {
+			break
+		}
 	}
 
 	head := w.Header().Get("Content-Type")
