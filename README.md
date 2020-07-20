@@ -11,7 +11,7 @@
 ## USAGE
 
 ```shell
-mkdir /go/src/github.com/Cherry0202 #user直下に作成してください
+mkdir go/src/github.com/Cherry0202 #user直下に作成してください
 cd /go/src/github.com/Cherry0202/
 git clone https://github.com/Cherry0202/RamenWikiStoreFunction.git
 cd RamenWikiStoreFunction
