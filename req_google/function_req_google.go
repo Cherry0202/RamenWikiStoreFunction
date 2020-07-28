@@ -207,5 +207,7 @@ func ReqUser(w http.ResponseWriter, _ *http.Request) {
 	email := "hoge@hoge.com"
 	user := db.SelectUser(email)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	json.NewEncoder(w).Encode(user)
 }
