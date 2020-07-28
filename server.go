@@ -11,6 +11,7 @@ const addr = ":8080"
 
 func handleRequests() {
 	http.HandleFunc("/", req_google.ReqGooglePlace)
+	http.HandleFunc("/user", req_google.ReqUser)
 	log.Println("Listening on localhost" + addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }

@@ -78,6 +78,10 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		placeId := rework.Results[i].PlaceID
 		resp := reqPhoneNumber(placeId)
 		err, storeName := db.InsertStore(rework.Results[i].Name, rework.Results[i].FormattedAddress, open_now, resp.FormattedPhoneNumber, resp.Website, rework.Results[i].Photos[0].PhotoReference, rework.Results[i].Geometry.Location.Lat, rework.Results[i].Geometry.Location.Lng, strings.Join(resp.OpeningHours.WeekdayText, ","))
+		log.Println(i)
+		if i > 19 {
+			break
+		}
 		if err != nil {
 			respJson(w, err.Error())
 			break
@@ -90,9 +94,6 @@ func ReqGooglePlace(w http.ResponseWriter, _ *http.Request) {
 		err = db.InsertWiki(storeId, storeName)
 		if err != nil {
 			respJson(w, err.Error())
-			break
-		}
-		if i == 20 {
 			break
 		}
 	}
@@ -200,4 +201,11 @@ func apiAuth() *maps.Client {
 	check(err)
 
 	return client
+}
+
+func ReqUser(w http.ResponseWriter, _ *http.Request) {
+	email := "hoge@hoge.com"
+	user := db.SelectUser(email)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(user)
 }

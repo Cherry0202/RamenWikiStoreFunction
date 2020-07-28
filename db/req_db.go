@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"github.com/Cherry0202/RamenWikiStoreFunction/structs"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"log"
@@ -58,4 +59,28 @@ func SelectStore(storeName string) (error, int) {
 	}
 
 	return nil, storeId
+}
+
+func SelectUser(email string) structs.User {
+	db := dbInit()
+	//id := 1
+	var user structs.User
+	rows, err := db.Query("SELECT id, name, password, email FROM users WHERE email = ?", email)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&user.ID, &user.Name, &user.Password, &user.Email)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(user.ID, user.Email)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return user
 }
